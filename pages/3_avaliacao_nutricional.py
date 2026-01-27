@@ -118,21 +118,52 @@ with st.form("avaliacao"):
     col1, col2 = st.columns(2)
 
     with col1:
-        peso = st.number_input("Peso (kg)", min_value=0.0, step=0.1, value=None, placeholder="Digite o peso")
-        altura_cm = st.number_input("Altura (cm)", min_value=0.0, step=0.5, value=None, placeholder="Digite a altura")
-        pescoco_cm = st.number_input("Pescoço (cm)", min_value=0.0, step=0.5, value=None, placeholder="Digite a circunferência do pescoço")
+        peso = st.number_input(
+            "Peso (kg)",
+            min_value=0.0, step=0.1,
+            value=float(last["peso"]) if last and last.get("peso") is not None else None,
+            placeholder="Digite o peso"
+        )
+        altura_cm = st.number_input(
+            "Altura (cm)",
+            min_value=0.0, step=0.5,
+            value=float(last["altura_cm"]) if last and last.get("altura_cm") is not None else None,
+            placeholder="Digite a altura"
+        )
+        pescoco_cm = st.number_input(
+            "Pescoço (cm) — US Navy",
+            min_value=0.0, step=0.5,
+            value=float(last["pescoco_cm"]) if last and last.get("pescoco_cm") is not None else None,
+            placeholder="Digite o pescoço"
+        )
 
     with col2:
-        cintura_cm = st.number_input("Cintura (cm)", min_value=0.0, step=0.5, value=None, placeholder="Digite a cintura")
-        quadril_cm = st.number_input("Quadril (cm)", min_value=0.0, step=0.5, value=None, placeholder="Digite o quadril")
+        cintura_cm = st.number_input(
+            "Cintura (cm)",
+            min_value=0.0, step=0.5,
+            value=float(last["cintura_cm"]) if last and last.get("cintura_cm") is not None else None,
+            placeholder="Digite a cintura"
+        )
+        quadril_cm = st.number_input(
+            "Quadril (cm)",
+            min_value=0.0, step=0.5,
+            value=float(last["quadril_cm"]) if last and last.get("quadril_cm") is not None else None,
+            placeholder="Digite o quadril"
+        )
 
     objetivo = st.selectbox("Objetivo", ["Emagrecimento", "Ganho de massa", "Manutenção", "Performance/saúde"])
     atividade = st.selectbox("Nível de atividade", ["Sedentário", "Leve", "Moderado", "Alto", "Muito alto"])
-    sono_h = st.number_input("Sono (h/dia)", min_value=0.0, max_value=24.0, step=0.5, value=7.0)
-    obs = st.text_area("Observações")
+    sono_h = st.number_input(
+        "Sono (h/dia)",
+        min_value=0.0, max_value=24.0, step=0.5,
+        value=float(last["sono_h"]) if last and last.get("sono_h") is not None else None,
+        placeholder="Horas de sono"
+    )
+    obs = st.text_area("Observações", value=(last.get("obs", "") if last else ""))
 
-    # ✅ O BOTÃO TEM QUE ESTAR AQUI
+    # ✅ ESTE BOTÃO PRECISA ESTAR AQUI DENTRO (mesma indentação de 'obs')
     ok = st.form_submit_button("Salvar avaliação")
+
 
 # Preview dos cálculos dentro do form (antes de salvar)
 st.markdown("### Resultados (prévia)")
