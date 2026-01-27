@@ -120,11 +120,11 @@ with st.form("avaliacao"):
     with col1:
         peso = st.number_input("Peso (kg)", min_value=0.0, step=0.1, value=None, placeholder="Digite o peso")
         altura_cm = st.number_input("Altura (cm)", min_value=0.0, step=0.5, value=None, placeholder="Digite a altura")
-        pescoco_cm = st.number_input("Pescoço (cm)", min_value=0.0, step=0.5, value=None)
+        pescoco_cm = st.number_input("Pescoço (cm)", min_value=0.0, step=0.5, value=None, placeholder="Digite a circunferência do pescoço")
 
     with col2:
-        cintura_cm = st.number_input("Cintura (cm)", min_value=0.0, step=0.5, value=None)
-        quadril_cm = st.number_input("Quadril (cm)", min_value=0.0, step=0.5, value=None)
+        cintura_cm = st.number_input("Cintura (cm)", min_value=0.0, step=0.5, value=None, placeholder="Digite a cintura")
+        quadril_cm = st.number_input("Quadril (cm)", min_value=0.0, step=0.5, value=None, placeholder="Digite o quadril")
 
     objetivo = st.selectbox("Objetivo", ["Emagrecimento", "Ganho de massa", "Manutenção", "Performance/saúde"])
     atividade = st.selectbox("Nível de atividade", ["Sedentário", "Leve", "Moderado", "Alto", "Muito alto"])
