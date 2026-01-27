@@ -14,7 +14,7 @@ def bootstrap(show_patient_picker: bool = True, require_login: bool = True):
     # --------- Proteção (login) ----------
     if require_login and not is_logged_in():
         st.sidebar.warning("Faça login para acessar.")
-        st.switch_page("pages/0_Login.py")
+        st.switch_page("pages/0_login.py")
         st.stop()
 
     # --------- Sidebar: usuário + logout ----------
