@@ -165,7 +165,7 @@ with st.form("avaliacao"):
     ok = st.form_submit_button("Salvar avaliação")
 
 
-# Preview dos cálculos dentro do form (antes de salvar)
+# # Preview dos cálculos (atualiza em tempo real)
 st.markdown("### Resultados (prévia)")
 
 # ---------- IMC ----------
@@ -225,8 +225,6 @@ else:
         st.write("**% Gordura (US Navy):** — (preencha pescoço + cintura + altura + quadril)")
     else:
         st.write("**% Gordura (US Navy):** — (preencha pescoço + cintura + altura)")
-
-ok = st.form_submit_button("Salvar avaliação")
 
 
 # -----------------------------
