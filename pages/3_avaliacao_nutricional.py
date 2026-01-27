@@ -118,12 +118,18 @@ with st.form("avaliacao"):
     col1, col2 = st.columns(2)
     with col1:
         peso = st.number_input(
-            "Peso (kg)", min_value=1.0, step=0.1,
-            value=float(last["peso"]) if last and last.get("peso") else 70.0
+            "Peso (kg)",
+            min_value=0.0,
+            step=0.1,
+            value=float(last["peso"]) if last and last.get("peso") is not None else None,
+            placeholder="Digite o peso"
         )
         altura_cm = st.number_input(
-            "Altura (cm)", min_value=50.0, step=0.5,
-            value=float(last["altura_cm"]) if last and last.get("altura_cm") else 170.0
+            "Altura (cm)",
+            min_value=0.0,
+            step=0.5,
+            value=float(last["altura_cm"]) if last and last.get("altura_cm") is not None else None,
+            placeholder="Digite a altura"
         )
         pescoco_cm = st.number_input(
             "Pescoço (cm) — US Navy", min_value=0.0, step=0.5,
@@ -150,37 +156,67 @@ with st.form("avaliacao"):
 
     # Preview dos cálculos dentro do form (antes de salvar)
     st.markdown("### Resultados (prévia)")
-    imc = calc_imc(float(peso), float(altura_cm))
+
+    # ---------- IMC ----------
+    imc = None
+    if peso is not None and altura_cm is not None:
+        imc = calc_imc(float(peso), float(altura_cm))
+
     if imc is not None:
         st.write(f"**IMC:** {imc:.2f} — **{classificar_imc(imc)}**")
     else:
         st.write("**IMC:** —")
 
-    corte_cc, status_cc = cc_status(sexo, float(cintura_cm))
-    if float(cintura_cm) > 0:
+    # ---------- Cintura (CC) ----------
+    corte_cc = 80.0 if sexo == "Feminino" else 94.0
+    if cintura_cm is not None and float(cintura_cm) > 0:
+        _, status_cc = cc_status(sexo, float(cintura_cm))
         st.write(f"**Cintura (CC):** {float(cintura_cm):.1f} cm — corte **{corte_cc:.0f} cm** → **{status_cc}**")
     else:
         st.write(f"**Cintura (CC):** — (corte {corte_cc:.0f} cm)")
 
-    corte_rcq, rcq, status_rcq = rcq_status(sexo, float(cintura_cm), float(quadril_cm))
+    # ---------- RCQ ----------
+    corte_rcq = 0.85 if sexo == "Feminino" else 1.00
+    rcq = None
+    status_rcq = "—"
+    if cintura_cm is not None and quadril_cm is not None and float(cintura_cm) > 0 and float(quadril_cm) > 0:
+        _, rcq, status_rcq = rcq_status(sexo, float(cintura_cm), float(quadril_cm))
+
     if rcq is not None:
         st.write(f"**RCQ:** {rcq:.2f} — corte **{corte_rcq:.2f}** → **{status_rcq}**")
     else:
         st.write(f"**RCQ:** — (corte {corte_rcq:.2f})")
 
-    bf = gordura_us_navy(
-        sexo=sexo,
-        altura_cm=float(altura_cm),
-        cintura_cm=float(cintura_cm),
-        pescoco_cm=float(pescoco_cm),
-        quadril_cm=float(quadril_cm) if sexo == "Feminino" else None
-    )
+    # ---------- % Gordura (US Navy) ----------
+    bf = None
+    if altura_cm is not None and cintura_cm is not None and pescoco_cm is not None:
+        # Regras mínimas: altura, cintura e pescoço
+        if float(altura_cm) > 0 and float(cintura_cm) > 0 and float(pescoco_cm) > 0:
+            quad_for_navy = None
+            if sexo == "Feminino":
+                if quadril_cm is not None and float(quadril_cm) > 0:
+                    quad_for_navy = float(quadril_cm)
+                else:
+                    quad_for_navy = None  # sem quadril não calcula em mulher
+
+            bf = gordura_us_navy(
+                sexo=sexo,
+                altura_cm=float(altura_cm),
+                cintura_cm=float(cintura_cm),
+                pescoco_cm=float(pescoco_cm),
+                quadril_cm=quad_for_navy
+            )
+
     if bf is not None:
         st.write(f"**% Gordura (US Navy):** {bf:.1f}%")
     else:
-        st.write("**% Gordura (US Navy):** — (preencha pescoço + medidas necessárias)")
+        if sexo == "Feminino":
+            st.write("**% Gordura (US Navy):** — (preencha pescoço + cintura + altura + quadril)")
+        else:
+            st.write("**% Gordura (US Navy):** — (preencha pescoço + cintura + altura)")
 
     ok = st.form_submit_button("Salvar avaliação")
+
 
 # -----------------------------
 # Salvar
