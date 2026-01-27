@@ -47,23 +47,25 @@ def init_db():
     conn = get_conn()
     cur = conn.cursor()
 
+    # helper para migration simples
     def _add_column_if_missing(table, column, coltype):
-    if USE_POSTGRES:
-        cur.execute("""
-            SELECT 1
-            FROM information_schema.columns
-            WHERE table_name = %s AND column_name = %s
-            LIMIT 1
-        """, (table, column))
-        exists = cur.fetchone() is not None
-        if not exists:
-            cur.execute(f'ALTER TABLE {table} ADD COLUMN {column} {coltype};')
-    else:
-        cur.execute(f"PRAGMA table_info({table})")
-        cols = [r[1] for r in cur.fetchall()]
-        if column not in cols:
-            cur.execute(f'ALTER TABLE {table} ADD COLUMN {column} {coltype};')
+        if USE_POSTGRES:
+            cur.execute("""
+                SELECT 1
+                FROM information_schema.columns
+                WHERE table_name = %s AND column_name = %s
+                LIMIT 1
+            """, (table, column))
+            exists = cur.fetchone() is not None
+            if not exists:
+                cur.execute(f'ALTER TABLE {table} ADD COLUMN {column} {coltype};')
+        else:
+            cur.execute(f"PRAGMA table_info({table})")
+            cols = [r[1] for r in cur.fetchall()]
+            if column not in cols:
+                cur.execute(f'ALTER TABLE {table} ADD COLUMN {column} {coltype};')
 
+    # tipos por banco
     if USE_POSTGRES:
         auto_id = "SERIAL PRIMARY KEY"
         text = "TEXT"
