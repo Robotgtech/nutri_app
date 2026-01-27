@@ -154,68 +154,68 @@ with st.form("avaliacao"):
     )
     obs = st.text_area("Observações", value=(last.get("obs", "") if last else ""))
 
-    # Preview dos cálculos dentro do form (antes de salvar)
-    st.markdown("### Resultados (prévia)")
+# Preview dos cálculos dentro do form (antes de salvar)
+st.markdown("### Resultados (prévia)")
 
-    # ---------- IMC ----------
-    imc = None
-    if peso is not None and altura_cm is not None:
-        imc = calc_imc(float(peso), float(altura_cm))
+# ---------- IMC ----------
+imc = None
+if peso is not None and altura_cm is not None:
+    imc = calc_imc(float(peso), float(altura_cm))
 
-    if imc is not None:
-        st.write(f"**IMC:** {imc:.2f} — **{classificar_imc(imc)}**")
-    else:
-        st.write("**IMC:** —")
+if imc is not None:
+    st.write(f"**IMC:** {imc:.2f} — **{classificar_imc(imc)}**")
+else:
+    st.write("**IMC:** —")
 
-    # ---------- Cintura (CC) ----------
-    corte_cc = 80.0 if sexo == "Feminino" else 94.0
-    if cintura_cm is not None and float(cintura_cm) > 0:
-        _, status_cc = cc_status(sexo, float(cintura_cm))
-        st.write(f"**Cintura (CC):** {float(cintura_cm):.1f} cm — corte **{corte_cc:.0f} cm** → **{status_cc}**")
-    else:
-        st.write(f"**Cintura (CC):** — (corte {corte_cc:.0f} cm)")
+# ---------- Cintura (CC) ----------
+corte_cc = 80.0 if sexo == "Feminino" else 94.0
+if cintura_cm is not None and float(cintura_cm) > 0:
+    _, status_cc = cc_status(sexo, float(cintura_cm))
+    st.write(f"**Cintura (CC):** {float(cintura_cm):.1f} cm — corte **{corte_cc:.0f} cm** → **{status_cc}**")
+else:
+    st.write(f"**Cintura (CC):** — (corte {corte_cc:.0f} cm)")
 
-    # ---------- RCQ ----------
-    corte_rcq = 0.85 if sexo == "Feminino" else 1.00
-    rcq = None
-    status_rcq = "—"
-    if cintura_cm is not None and quadril_cm is not None and float(cintura_cm) > 0 and float(quadril_cm) > 0:
-        _, rcq, status_rcq = rcq_status(sexo, float(cintura_cm), float(quadril_cm))
+# ---------- RCQ ----------
+corte_rcq = 0.85 if sexo == "Feminino" else 1.00
+rcq = None
+status_rcq = "—"
+if cintura_cm is not None and quadril_cm is not None and float(cintura_cm) > 0 and float(quadril_cm) > 0:
+    _, rcq, status_rcq = rcq_status(sexo, float(cintura_cm), float(quadril_cm))
 
-    if rcq is not None:
-        st.write(f"**RCQ:** {rcq:.2f} — corte **{corte_rcq:.2f}** → **{status_rcq}**")
-    else:
-        st.write(f"**RCQ:** — (corte {corte_rcq:.2f})")
+if rcq is not None:
+    st.write(f"**RCQ:** {rcq:.2f} — corte **{corte_rcq:.2f}** → **{status_rcq}**")
+else:
+    st.write(f"**RCQ:** — (corte {corte_rcq:.2f})")
 
-    # ---------- % Gordura (US Navy) ----------
-    bf = None
-    if altura_cm is not None and cintura_cm is not None and pescoco_cm is not None:
-        # Regras mínimas: altura, cintura e pescoço
-        if float(altura_cm) > 0 and float(cintura_cm) > 0 and float(pescoco_cm) > 0:
-            quad_for_navy = None
-            if sexo == "Feminino":
-                if quadril_cm is not None and float(quadril_cm) > 0:
-                    quad_for_navy = float(quadril_cm)
-                else:
-                    quad_for_navy = None  # sem quadril não calcula em mulher
-
-            bf = gordura_us_navy(
-                sexo=sexo,
-                altura_cm=float(altura_cm),
-                cintura_cm=float(cintura_cm),
-                pescoco_cm=float(pescoco_cm),
-                quadril_cm=quad_for_navy
-            )
-
-    if bf is not None:
-        st.write(f"**% Gordura (US Navy):** {bf:.1f}%")
-    else:
+# ---------- % Gordura (US Navy) ----------
+bf = None
+if altura_cm is not None and cintura_cm is not None and pescoco_cm is not None:
+    # Regras mínimas: altura, cintura e pescoço
+    if float(altura_cm) > 0 and float(cintura_cm) > 0 and float(pescoco_cm) > 0:
+        quad_for_navy = None
         if sexo == "Feminino":
-            st.write("**% Gordura (US Navy):** — (preencha pescoço + cintura + altura + quadril)")
-        else:
-            st.write("**% Gordura (US Navy):** — (preencha pescoço + cintura + altura)")
+            if quadril_cm is not None and float(quadril_cm) > 0:
+                quad_for_navy = float(quadril_cm)
+            else:
+                quad_for_navy = None  # sem quadril não calcula em mulher
 
-    ok = st.form_submit_button("Salvar avaliação")
+        bf = gordura_us_navy(
+            sexo=sexo,
+            altura_cm=float(altura_cm),
+            cintura_cm=float(cintura_cm),
+            pescoco_cm=float(pescoco_cm),
+            quadril_cm=quad_for_navy
+        )
+
+if bf is not None:
+    st.write(f"**% Gordura (US Navy):** {bf:.1f}%")
+else:
+    if sexo == "Feminino":
+        st.write("**% Gordura (US Navy):** — (preencha pescoço + cintura + altura + quadril)")
+    else:
+        st.write("**% Gordura (US Navy):** — (preencha pescoço + cintura + altura)")
+
+ok = st.form_submit_button("Salvar avaliação")
 
 
 # -----------------------------
