@@ -1,7 +1,7 @@
 import os
+import streamlit as st
 import sqlite3
 import json
-from urllib.parse import urlparse
 from pathlib import Path
 from datetime import datetime
 
@@ -18,13 +18,6 @@ USE_POSTGRES = bool(RAW_DATABASE_URL)
 
 DATABASE_URL = normalize_db_url(RAW_DATABASE_URL) if RAW_DATABASE_URL else None
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
 def get_conn():
     if USE_POSTGRES:
         return get_postgres_conn()
@@ -37,22 +30,15 @@ def get_sqlite_conn():
     conn.row_factory = sqlite3.Row
     return conn
 
+@st.cache_resource
 def get_postgres_conn():
     import psycopg2
     from psycopg2.extras import RealDictCursor
-
-    url = urlparse(DATABASE_URL)
-
-    conn = psycopg2.connect(
-        dbname=url.path[1:],
-        user=url.username,
-        password=url.password,
-        host=url.hostname,
-        port=url.port or 5432,
+    return psycopg2.connect(
+        DATABASE_URL,
         sslmode="require",
-        cursor_factory=RealDictCursor,  # 🔥 fetchone/fetchall viram dict
+        cursor_factory=RealDictCursor,
     )
-    return conn
 
 # --------------------------------------------------
 # Inicialização do banco
