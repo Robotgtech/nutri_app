@@ -30,7 +30,6 @@ def get_sqlite_conn():
     conn.row_factory = sqlite3.Row
     return conn
 
-@st.cache_resource
 def get_postgres_conn():
     import psycopg2
     from psycopg2.extras import RealDictCursor
