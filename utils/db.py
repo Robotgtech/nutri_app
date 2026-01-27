@@ -511,7 +511,7 @@ def create_user(email: str, password_hash: str):
 
     user_id = None
     if USE_POSTGRES:
-        user_id = cur.fetchone()[0]
+        user_id = cur.fetchone()["id"]
     else:
         user_id = cur.lastrowid
 
