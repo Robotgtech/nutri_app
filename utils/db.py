@@ -47,6 +47,23 @@ def init_db():
     conn = get_conn()
     cur = conn.cursor()
 
+    def _add_column_if_missing(table, column, coltype):
+    if USE_POSTGRES:
+        cur.execute("""
+            SELECT 1
+            FROM information_schema.columns
+            WHERE table_name = %s AND column_name = %s
+            LIMIT 1
+        """, (table, column))
+        exists = cur.fetchone() is not None
+        if not exists:
+            cur.execute(f'ALTER TABLE {table} ADD COLUMN {column} {coltype};')
+    else:
+        cur.execute(f"PRAGMA table_info({table})")
+        cols = [r[1] for r in cur.fetchall()]
+        if column not in cols:
+            cur.execute(f'ALTER TABLE {table} ADD COLUMN {column} {coltype};')
+
     if USE_POSTGRES:
         auto_id = "SERIAL PRIMARY KEY"
         text = "TEXT"
@@ -94,21 +111,23 @@ def init_db():
 
     # ---------- assessments ----------
     cur.execute(f"""
-    CREATE TABLE IF NOT EXISTS assessments (
-        id {auto_id},
-        user_id INTEGER,
-        patient_id INTEGER NOT NULL,
-        data_iso {text} NOT NULL,
-        peso {real},
-        altura_cm {real},
-        cintura_cm {real},
-        quadril_cm {real},
-        objetivo {text},
-        atividade {text},
-        sono_h {real},
-        obs {text}
-    );
-    """)
+        CREATE TABLE IF NOT EXISTS assessments (
+            id {auto_id},
+            user_id INTEGER,
+            patient_id INTEGER NOT NULL,
+            data_iso {text} NOT NULL,
+            peso {real},
+            altura_cm {real},
+            cintura_cm {real},
+            quadril_cm {real},
+            pescoco_cm {real},
+            bf_usnavy_pct {real},
+            objetivo {text},
+            atividade {text},
+            sono_h {real},
+            obs {text}
+        );
+        """)
 
     # ---------- diets ----------
     cur.execute(f"""
@@ -331,8 +350,9 @@ def create_assessment(patient_id, payload: dict, user_id=None):
         cur.execute("""
             INSERT INTO assessments (
                 user_id, patient_id, data_iso, peso, altura_cm, cintura_cm,
-                quadril_cm, objetivo, atividade, sono_h, obs
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                quadril_cm, pescoco_cm, bf_usnavy_pct,
+                objetivo, atividade, sono_h, obs
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING id
         """, (
             user_id,
@@ -342,6 +362,8 @@ def create_assessment(patient_id, payload: dict, user_id=None):
             payload.get("altura_cm"),
             payload.get("cintura_cm"),
             payload.get("quadril_cm"),
+            payload.get("pescoco_cm"),
+            payload.get("bf_usnavy_pct"),
             payload.get("objetivo"),
             payload.get("atividade"),
             payload.get("sono_h"),
@@ -352,8 +374,9 @@ def create_assessment(patient_id, payload: dict, user_id=None):
         cur.execute("""
             INSERT INTO assessments (
                 user_id, patient_id, data_iso, peso, altura_cm, cintura_cm,
-                quadril_cm, objetivo, atividade, sono_h, obs
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                quadril_cm, pescoco_cm, bf_usnavy_pct,
+                objetivo, atividade, sono_h, obs
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             user_id,
             patient_id,
@@ -362,6 +385,8 @@ def create_assessment(patient_id, payload: dict, user_id=None):
             payload.get("altura_cm"),
             payload.get("cintura_cm"),
             payload.get("quadril_cm"),
+            payload.get("pescoco_cm"),
+            payload.get("bf_usnavy_pct"),
             payload.get("objetivo"),
             payload.get("atividade"),
             payload.get("sono_h"),
@@ -372,7 +397,6 @@ def create_assessment(patient_id, payload: dict, user_id=None):
     conn.commit()
     conn.close()
     return new_id
-
 
 def get_last_assessment(patient_id, user_id=None):
     conn = get_conn()

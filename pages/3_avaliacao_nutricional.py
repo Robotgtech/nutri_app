@@ -184,6 +184,8 @@ if ok:
                 "altura_cm": float(altura_cm),
                 "cintura_cm": float(cintura_cm),
                 "quadril_cm": float(quadril_cm),
+                "pescoco_cm": float(pescoco_cm),
+                "bf_usnavy_pct": float(bf) if bf is not None else None,
                 "objetivo": objetivo,
                 "atividade": atividade,
                 "sono_h": float(sono_h),
