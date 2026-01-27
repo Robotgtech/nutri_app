@@ -97,13 +97,21 @@ if last:
 # -----------------------------
 # Form
 # -----------------------------
+sexo_raw = (patient.get("sexo") or "").strip().lower()
+if sexo_raw in ["m", "masc", "masculino", "homem"]:
+    sexo_default_idx = 1
+elif sexo_raw in ["f", "fem", "feminino", "mulher"]:
+    sexo_default_idx = 0
+else:
+    sexo_default_idx = 0  # padrão
+
 with st.form("avaliacao"):
     sexo = st.selectbox(
         "Sexo (para pontos de corte e US Navy)",
         ["Feminino", "Masculino"],
-        index=0 if (patient.get("sexo") or "").lower().startswith("f") else 1
-        if (patient.get("sexo") or "").lower().startswith("m") else 0
+        index=sexo_default_idx
     )
+
 
     col1, col2 = st.columns(2)
     with col1:
