@@ -1,0 +1,10 @@
+# banco e arquivos gerados
+data/*.db
+data/*.pdf
+
+# cache python
+__pycache__/
+*.pyc
+
+# ambiente
+.env
