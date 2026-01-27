@@ -130,6 +130,14 @@ def init_db():
             obs {text}
         );
         """)
+    
+    if USE_POSTGRES:
+        cur.execute("ALTER TABLE assessments ADD COLUMN IF NOT EXISTS pescoco_cm REAL;")
+        cur.execute("ALTER TABLE assessments ADD COLUMN IF NOT EXISTS bf_usnavy_pct REAL;")
+    else:
+        _add_column_if_missing("assessments", "pescoco_cm", "REAL")
+        _add_column_if_missing("assessments", "bf_usnavy_pct", "REAL")
+
 
     # ---------- diets ----------
     cur.execute(f"""
