@@ -89,6 +89,7 @@ patient = get_patient(pid, user_id=uid)
 st.subheader(f"Paciente: {patient['nome']} (ID {patient['id']})")
 
 last = get_last_assessment(pid, user_id=uid)
+
 if last:
     st.caption("Última avaliação registrada:")
     st.json(last)
@@ -201,6 +202,8 @@ if ok:
         )
 
         st.success("Avaliação salva com sucesso!")
+        st.rerun()
+
     except Exception as e:
         log_event(
             user_id=uid,
