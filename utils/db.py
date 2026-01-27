@@ -586,6 +586,59 @@ def list_appointments(user_id=None):
     conn.close()
     return [dict(r) for r in rows]
 
+def update_appointment(appointment_id, user_id, patient_id=None, dt_iso=None, tipo=None, notas=None):
+    """
+    Atualiza campos do agendamento. Passe apenas o que quiser mudar.
+    """
+    sets = []
+    params = []
+
+    def add(field, value):
+        sets.append(f"{field} = " + ("?" if not USE_POSTGRES else "%s"))
+        params.append(value)
+
+    if patient_id is not None:
+        add("patient_id", patient_id)
+    if dt_iso is not None:
+        add("dt_iso", dt_iso)
+    if tipo is not None:
+        add("tipo", tipo)
+    if notas is not None:
+        add("notas", notas)
+
+    if not sets:
+        return
+
+    params.extend([appointment_id, user_id])
+
+    conn = get_conn()
+    cur = conn.cursor()
+
+    cur.execute(
+        f"UPDATE appointments SET {', '.join(sets)} WHERE id = "
+        + ("?" if not USE_POSTGRES else "%s")
+        + " AND user_id = "
+        + ("?" if not USE_POSTGRES else "%s"),
+        tuple(params)
+    )
+
+    conn.commit()
+    conn.close()
+
+
+def delete_appointment(appointment_id, user_id):
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute(
+        "DELETE FROM appointments WHERE id = ? AND user_id = ?"
+        if not USE_POSTGRES else
+        "DELETE FROM appointments WHERE id = %s AND user_id = %s",
+        (appointment_id, user_id)
+    )
+    conn.commit()
+    conn.close()
+
+
 # --------------------------------------------------
 # Foods (TACO)
 # --------------------------------------------------
