@@ -3,6 +3,7 @@ from utils.bootstrap import bootstrap
 from utils.db import get_patient, create_appointment, list_appointments, log_event
 from datetime import date, time, datetime
 
+
 st.set_page_config(page_title="Agenda", page_icon="📅", layout="wide")
 bootstrap(show_patient_picker=True, require_login=True)
 
@@ -28,6 +29,8 @@ with st.form("agendar"):
     tipo = st.selectbox("Tipo", ["Consulta", "Retorno", "Reavaliação"])
     notas = st.text_area("Notas")
     ok = st.form_submit_button("Criar agendamento")
+
+uid = st.session_state["user"]["id"]
 
 if ok:
     dt_iso = datetime.combine(d, h).isoformat()
