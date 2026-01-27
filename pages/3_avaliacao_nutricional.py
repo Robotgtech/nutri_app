@@ -97,22 +97,24 @@ if last:
 # -----------------------------
 # Form
 # -----------------------------
+# --- sexo vindo do cadastro (FORA do form) ---
 sexo_raw = (patient.get("sexo") or "").strip().lower()
+
 if sexo_raw in ["m", "masc", "masculino", "homem"]:
-    sexo_default_idx = 1
+    sexo = "Masculino"
 elif sexo_raw in ["f", "fem", "feminino", "mulher"]:
-    sexo_default_idx = 0
+    sexo = "Feminino"
 else:
-    sexo_default_idx = 0  # padrão
-
-with st.form("avaliacao"):
-    sexo = st.selectbox(
-        "Sexo (para pontos de corte e US Navy)",
-        ["Feminino", "Masculino"],
-        index=sexo_default_idx
+    st.warning(
+        "⚠️ Sexo não informado no cadastro do paciente. "
+        "Vá em Cadastro de Pacientes e preencha o sexo."
     )
+    st.stop()
 
+st.caption(f"Sexo do cadastro: **{sexo}**")
 
+# --- form ---
+with st.form("avaliacao"):
     col1, col2 = st.columns(2)
     with col1:
         peso = st.number_input(
