@@ -204,6 +204,16 @@ def _dicts(rows):
     # postgres (RealDictCursor): já vem dict
     return [dict(r) for r in rows]
 
+
+def _scalar(row):
+    if row is None:
+        return None
+    # Postgres (RealDictCursor) → dict
+    if isinstance(row, dict):
+        return list(row.values())[0]
+    # SQLite → tuple
+    return row[0]
+
 def is_email_allowed(email: str) -> bool:
     email = (email or "").strip().lower()
     if not email:
@@ -619,7 +629,8 @@ def count_foods():
     conn = get_conn()
     cur = conn.cursor()
     cur.execute("SELECT COUNT(*) FROM foods")
-    n = cur.fetchone()[0]
+    row = cur.fetchone()
+    n = _scalar(row)
     conn.close()
     return int(n)
 
