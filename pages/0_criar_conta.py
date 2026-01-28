@@ -45,4 +45,4 @@ if ok:
 
 st.divider()
 if st.button("Voltar para Login"):
-    st.switch_page("pages/0_Login.py")
+    st.switch_page("pages/0_login.py")
