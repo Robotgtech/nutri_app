@@ -41,6 +41,6 @@ if ok:
 st.divider()
 st.caption("Ainda não tem conta?")
 if st.button("Criar conta"):
-    st.switch_page("pages/0_Criar_Conta.py")
+    st.switch_page("pages/0_criar_conta.py")
 
 
